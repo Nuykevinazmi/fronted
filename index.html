@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>MLBB Checker Manual Captcha</title>
+<title>MLBB Checker Manual Captcha by Arif Hidayatulloh</title>
 <script src="https://cstaticdun.126.net/load.min.js"></script>
 <style>
   body { font-family: Arial; max-width: 900px; margin: auto; padding: 20px; background: #121212; color: #eee; }
@@ -29,7 +29,6 @@
 <button id="startBtn">Start Checking</button>
 <button id="stopBtn" disabled>Stop</button>
 <button id="downloadBtn">Download valid.txt</button>
-<button id="loadValidBtn">Load Saved Valid</button>
 <div id="status" style="margin-top:10px;"></div>
 
 <div id="captcha-root"></div>
@@ -38,7 +37,7 @@
 
 <script>
 const CAPTCHA_ID = "fef5c67c39074e9d845f4bf579cc07af"; 
-const WORKER_URL = "https://mlfullinfo.bonar7527.workers.dev"; // Ganti sesuai URL Worker
+const WORKER_URL = "https://worker.bonar7527.workers.dev"; // Ganti sesuai URL Worker
 
 let combos = [];
 let currentIndex = 0;
